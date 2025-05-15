@@ -90,7 +90,7 @@
  .from('users')
  .insert({strategy: selected, ref_id: generateRandomString(), name: document.getElementById('Name').value, uid: data.user.id, specification: document.getElementById('specify').value});
    if(error){
-    alert('Registration error:', error.message);
+    alert( error.message);
     return;
    }
    document.getElementById('cover_m').innerHTML='Registration successfull: An Email Has Been Sent To Confirm Email Address'
