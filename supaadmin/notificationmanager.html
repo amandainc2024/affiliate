@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title></title>
+ <script src="control.js"></script><script src="../browser.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body class="box-border text-blue-1000 px-0 bg-gray-100 pt-1">
+      <div id="cv" class="backdrop-blur loading flex flex-col justify-center items-center bg-[rgb(0,0,0,0.6)] fixed inset-0 z-5">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="size-20 animate-spin">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+    </svg>
+    <b id="cover_m" class="text-center font-normal text-white">Loading </b>
+    
+  </div>
+
+ <h1 class="my-18 text-center text-3xl text-blue-900 font-bold">Add an Idea</h1>
+
+
+
+<div class="bg-white w-full my-2 px-2 py-3 ">
+  <h1 class="text-2xl flex items-center font-bold" contenteditable>Your idea title? <span class="hidden bg-red-600 text-xs text-white py-1 px-2 rounded">NEW</span></h1>
+  <textarea rows="14" class="ta border rounded w-full text-sm" placeholder="Post your idea here to enable our affiliates better in what they are doing. It can span about 2000 characters"></textarea>
+  <p class="text-blue-900 flex justify-between"><span id="dt">23-09-2042</span>
+  <button class="bg-blue-50 px-2 rounded py-1 text-sm " type="button" onclick="enhance()" id="enh">Enhance with AI</button>
+  </p>
+</div>
+  <p id="error" class="bg-red-100 hidden mx-2 border-red-600 border block rounded p-2 text-red-700"></p>
+  <p id="success" class="bg-green-100 hidden mx-2 border-green-600 border block rounded p-2 text-green-700"></p>
+
+     <button class="block py-2 ml-4 w-11/12 bg-blue-800 mt-5 text-white rounded-sm" onclick="send()">Post</button>
+
+<div class="ai hidden overflow-scroll fixed top-15 left-7 w-5/6 bg-white h-3/4 shadow rounded">
+  <h2 class="text-2xl font-bold text-center py-7">AI Enhancement</h2>
+  <p class="bg-green-100 rounded mx-2 p-2 text-green-700"></p>
+  <b onclick="document.querySelector('.ai').style.display = 'none'" class="text-red-700 w-full text-center">Close</b>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  
+  
+  const supabaseUrl = "https://dlittddujwtdceassnwh.supabase.co";
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXR0ZGR1and0ZGNlYXNzbndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjUwMzksImV4cCI6MjA2MTYwMTAzOX0.Ro-mvdFQr1FDh219EPuI2Fm2S3yYXeTBwiO9UxIFv0s'; // Replace with your public anon key
+  
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  async function auth() {
+  const { data: sessionData } = await client.auth.getSession();
+  if (!sessionData.session) {
+    location.href = '/auth.html';
+  } else {
+    const uid = sessionData.session.user.id;
+    const { data: userData, error: userError } = await client.from('users').select('*').eq('uid', uid).single();
+    if (!userData || userData.type !== 'admin') {
+      location.href = '/auth.html';
+      console.log(userData)
+    } else {
+      document.getElementById('cv').style.display = 'none';
+    }
+  }
+}
+auth()
+
+var datePreview = document.getElementById('dt')
+ const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+datePreview.textContent = today;
+
+
+function enhance(){
+  document.getElementById('enh').innerHTML="Enhancing ";
+  const apiKey = 'bDKq37adMzVG8xZQ7ES9aaeL2M0xeT8t'; // Replace with your actual key
+  const content = 'Expand and remove errors from the text below (Put the altered text in []): '+document.querySelector('.ta').value;
+  const data = {
+    model: 'mistral-large-latest',
+    messages: [{ role: 'user', content: content }]
+  };
+
+  fetch('https://api.mistral.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(chatResponse => {
+    document.querySelector('.ai p').innerText = chatResponse.choices[0].message.content;
+    document.querySelector('.ai').style.display = 'block'
+    document.getElementById('enh').innerHTML="Enhance with AI ";
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+
+async function send() {
+  
+  const title = document.querySelector('h1[contenteditable]').innerText.trim();
+  const idea = document.querySelector('.ta').value.trim();
+
+  const {data , error} = await client.from('ideas').insert({
+    title:title,
+    p:idea
+  })
+  if(error){
+    console.log(error);
+    document.getElementById('error').innerHTML="An error occured:"+error.message;
+    document.getElementById('error').style.display = 'block'
+    setTimeout(function() {
+  document.getElementById('error').style.display = 'none';
+}, 4500)
+
+  }
+  else{
+    document.querySelector('h1[contenteditable]').innerText = 'Your title here'
+    document.querySelector('.ta').value =''
+    document.getElementById('success').innerHTML = "Successfully added";
+document.getElementById('success').style.display = 'block';
+setTimeout(function(){
+  document.getElementById('success').style.display = 'none';
+},2500)
+  }
+}
+
+</script>
+
+</body>
+</html>

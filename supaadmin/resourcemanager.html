@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title></title>
+ <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+ <script src="../browser.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body class="box-border text-blue-900 px-2 pb-18 bg-gray-100 ">
+    <div id="cv" class="backdrop-blur loading flex flex-col justify-center items-center bg-[rgb(0,0,0,0.6)] fixed inset-0 z-5">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" class="size-20 animate-spin">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+    </svg>
+    <b id="cover_m" class="text-center font-normal text-white">Loading </b>
+    
+  </div>
+ 
+ <h1 class="my-1  text-xl font-bold">Resource Manager</h1>
+   <p id="error" class="bg-red-100 hidden mx-2 border-red-600 border block rounded p-2 text-red-700"></p>
+  <p id="success" class="bg-green-100 hidden mx-2 border-green-600 border block rounded p-2 text-green-700"></p>
+
+  <div class="shadow bg-white my-5 p-5 rounded-sm">
+   <img class="w-5/6 my-2 mx-auto" id="preview" src="https://jkfenner.com/wp-content/uploads/2019/11/default.jpg" alt="">
+   <video src="" preload="none" class="hidden w-11/12 mx-auto" controls autoplay></video>
+   <hr class="text-gray-400 w-full">
+   <p class="w-5/12 inline-block"><b class="inline-block  " >Type</b><br><span id="typePreview">Image</span></p>
+   <p class="w-5/12 inline-block"><b class="inline-block " >Subject Product</b><br><span id="subjectPreview">Web design</span></p>
+   <p class="w-5/12 inline-block"><b class="inline-block " >Date Published</b><br><span id="datePreview"></span></p>
+   <p class="w-5/12 inline-block"><b class="inline-block  ">Downloads</b><br>0</p>
+   
+  </div>
+    
+   <form action="">
+    <label for="img" class="block bg-blue-100 p-2 rounded">Choose file</label>
+     <input type="file" accept="image/*,video/*" class="hidden" name="" id="img"/>
+    <br>
+    
+     <label for="mediaType">Select Type</label>
+     <select name="type" class="border rounded" id="mediaType">
+      <option value="Image">Image</option>
+      <option value="Video">Video</option>
+     </select><br><br>
+         
+     <label for="subjectProduct">Select Subject Product</label>
+     <select name="type" class="border rounded" id="subjectProduct">
+      <option value="Web Design">Web Design</option>
+      <option value="App Development">App Development</option>
+      <option value="Graphic Design">Graphic Design</option>
+      <option value="Social Media">Social Media</option>
+      <option value="Other">Other</option>
+     </select>
+     
+     <button class="block py-1 w-full bg-blue-800 mt-5 text-white rounded-sm" type="button" onclick="post()">Post</button>
+   </form>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+  const fileInput = document.getElementById('img');
+  const previewImage = document.getElementById('preview');
+  const previewVideo = document.querySelector('video');
+  const typeSelect = document.getElementById('mediaType');
+  const subjectSelect = document.getElementById('subjectProduct');
+
+  const typePreview = document.getElementById('typePreview');
+  const subjectPreview = document.getElementById('subjectPreview');
+  const datePreview = document.getElementById('datePreview');
+
+  // Set today's date
+  const today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+  datePreview.textContent = today;
+
+  // File preview logic
+  fileInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const fileURL = URL.createObjectURL(file);
+    const fileType = file.type;
+
+    if (fileType.startsWith('image/')) {
+      previewVideo.classList.add('hidden');
+      previewImage.src = fileURL;
+      previewImage.classList.remove('hidden');
+      typeSelect.value = 'Image';
+      typePreview.textContent = 'Image';
+    } else if (fileType.startsWith('video/')) {
+      previewImage.classList.add('hidden');
+      previewVideo.src = fileURL;
+      previewVideo.load();
+      previewVideo.play();
+      previewVideo.classList.remove('hidden');
+      typeSelect.value = 'Video';
+      typePreview.textContent = 'Video';
+    }
+  });
+
+  // Update preview when select inputs change
+  typeSelect.addEventListener('change', () => {
+    typePreview.textContent = typeSelect.value;
+  });
+
+  subjectSelect.addEventListener('change', () => {
+    subjectPreview.textContent = subjectSelect.value;
+  });
+
+  //https://dlittddujwtdceassnwh.supabase.co/storage/v1/object/public/resources/2025-05-03T04:50:05BUILD YOUR BUSINESS ONLINE.jpg
+  
+  const supabaseUrl = "https://dlittddujwtdceassnwh.supabase.co";
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXR0ZGR1and0ZGNlYXNzbndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjUwMzksImV4cCI6MjA2MTYwMTAzOX0.Ro-mvdFQr1FDh219EPuI2Fm2S3yYXeTBwiO9UxIFv0s'; // Replace with your public anon key
+  
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  async function auth() {
+  const { data: sessionData } = await client.auth.getSession();
+  if (!sessionData.session) {
+    location.href = '/auth.html';
+  } else {
+    const uid = sessionData.session.user.id;
+    const { data: userData, error: userError } = await client.from('users').select('*').eq('uid', uid).single();
+    if (!userData || userData.type !== 'admin') {
+      location.href = '/auth.html';
+      console.log(userData)
+    } else {
+      document.getElementById('cv').style.display = 'none';
+    }
+  }
+}
+auth()
+function message(type,message){
+  document.getElementById(type).innerText = message;
+  document.getElementById(type).style.display = 'block'
+  setTimeout(function(){
+    document.getElementById(type).style.display = 'none'
+  },2500)
+}
+
+async function post() {
+  const nowt = new Date().toISOString().replace(/[:.]/g, '-');
+  const resourceFile = fileInput.files[0];
+
+  if (!resourceFile) {
+    message('error', 'Select a file to continue');
+    return;
+  }
+
+  const safeName = `${nowt}-${resourceFile.name.replace(/\s+/g, '_')}`;
+  message('success', 'Uploading...');
+
+  const { data, error } = await client.storage.from('resources').upload(safeName, resourceFile, {
+    cacheControl: '3600',
+    upsert: false
+  });
+
+  if (error) {
+    message('error', error.message);
+    return;
+  }
+
+  const uUrl = `https://dlittddujwtdceassnwh.supabase.co/storage/v1/object/public/resources/${data.path}`;
+
+  const { error: insertError, data: insertData } = await client.from('resources').insert({
+    url: uUrl,
+    product: subjectPreview.innerText,
+    type: typePreview.innerText
+  });
+
+  if (insertError) {
+    message('error', insertError.message);
+  } else {
+    message('success', "Successfully uploaded");
+  }
+}
+
+</script>
+
+</body>
+
+</html>
