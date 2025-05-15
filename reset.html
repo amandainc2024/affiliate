@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reset Password</title>
+  <script src="browser.js"></script>
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h2 class="text-center font-bold text-2xl my-24">Reset Your Password</h2>
+  <p class="p-2 rounded border m-2  border-blue-700 bg-blue-100 "  id="message">Enter a new password</p>
+
+  <input class=" m-4 box-border border-gray-500 p-2 w-11/12 outline-0 border rounded-sm"   type="password" id="new-password" placeholder="Enter new password" />
+  <button class="bg-blue-600 float-right text-white mt-3 mr-5 py-1 px-3 rounded-sm " onclick="rP()">Update Password</button>
+
+  <script>
+    // Initialize Supabase client
+    const client = window.supabase.createClient(
+      "https://dlittddujwtdceassnwh.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXR0ZGR1and0ZGNlYXNzbndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjUwMzksImV4cCI6MjA2MTYwMTAzOX0.Ro-mvdFQr1FDh219EPuI2Fm2S3yYXeTBwiO9UxIFv0s"
+    );
+
+
+    async function resetPassword() {
+      const newPassword = document.getElementById('new-password').value;
+      const { data, error } = await client.auth.updateUser({
+        password: newPassword
+      });
+
+      const message = document.getElementById('message');
+      if (error) {
+        message.textContent = 'Error: ' + error.message;
+      } else {
+        message.textContent = 'Password updated successfully!';
+      }
+    }
+    function rP(){
+      const url = new URL(location.href);
+const type = url.searchParams.get("type");
+
+if (type === "recovery") {
+  resetPassword()
+}
+    }
+  </script>
+</body> 
+</html>

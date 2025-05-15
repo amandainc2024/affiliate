@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title></title>
+ <script src="control.js"></script><script src="browser.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body class="border-box px-2">
+ 
+ <h1 class="my-18 text-center text-3xl font-bold">Sign Up</h1>
+ 
+ <form action="">
+  <a href="auth.html" class="text-blue-600 block">Log in</a>
+  
+  <output style="display: none;" class="border-red-500 bg-red-100 block p-2 w-full outline-0 border rounded-sm" id="error">Error: Some kind of error message on submission</output>
+  <label for="Name" class="mt-5 block">Name</label>
+  <input type="text" name="Name" id="Name" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" value="" />
+  
+  <label for="email" class="mt-5 block">Email</label>
+  <input type="email" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" name="email" id="email" value="" />
+  
+  <label for="password" class="mt-5 block">Password</label>
+  <input type="password" name="password" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" id="password" value="" />
+  <b onclick="document.getElementById('password').setAttribute('type','text');this.style.display='none'" class="font-normal text-blue-500">Show Password</b>
+  <label for="Strategy" class="mt-5 block">Choose your marketing strategy</label>
+  <select name="strategy" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" id="Strategy" multiple>
+   <option value="Website adverts">Website adverts</option>
+   <option value="Email Marketing">Email Marketing</option>
+   <option value="Social Media">Social Media</option>
+   <option value="Referrals">Referrals</option>
+   <option value="Others">Others</option>
+  </select>
+  
+  <label for="specify" class="mt-5 block">Please specify others</label>
+  <textarea class="border-gray-500 p-2 w-full outline-0 border rounded-sm" name="" id="specify" rows="3"></textarea>
+  
+  <p><input type="checkbox" name="" id=""> I have read and agreed the <a href="https://amandainc.xyz/legal/terms.html" class="underline">terms of service</a> and <a class="underline" href="https://amandainc.xyz/legal/privacy.html">privacy policy</a>.</p>
+  <button  class="bg-blue-600 float-right text-white mt-3 py-2 px-4 rounded-sm " onclick="su(event)" type="submit">Continue</button>
+ </form>
+ <p class="mt-32 text-center">&copy; Copyright 2025. All rights reserved</p>
+
+ <div style="display:none" id="cover" class="fixed flex flex-col justify-center items-center bg-[rgba(0,0,0,0.75)] inset-0">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff"  class="size-20 animate-spin">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+</svg>
+<b id="cover_m" class="text-center font-normal text-white"></b>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Initialize Supabase client
+  
+  const supabaseUrl = "https://dlittddujwtdceassnwh.supabase.co";
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXR0ZGR1and0ZGNlYXNzbndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjUwMzksImV4cCI6MjA2MTYwMTAzOX0.Ro-mvdFQr1FDh219EPuI2Fm2S3yYXeTBwiO9UxIFv0s'; // Replace with your public anon key
+  
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  async function registerUser(email, password) {
+   const select = document.getElementById('Strategy');
+   const selected = Array.from(select.selectedOptions).map(option => option.value).join(', ');
+   function generateRandomString(length = 12) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+    const { data, error } = await client.auth.signUp({
+      email: email,
+      password: password
+    });
+      
+
+    if (error) {
+      console.error('Registration error:', error.message);
+       const errorBox = document.getElementById('error');
+
+ errorBox.textContent = "Error: " + error.message;
+ errorBox.style.display = "block";
+
+      
+    } else {
+      console.log('User registered:', data.user.id);
+      
+      const { error } = await client
+ .from('users')
+ .insert({strategy: selected, ref_id: generateRandomString(), name: document.getElementById('Name').value, uid: data.user.id, specification: document.getElementById('specify').value});
+   if(error){
+    alert('Registration error:', error.message);
+    return;
+   }
+   document.getElementById('cover_m').innerHTML='Registration successfull: An Email Has Been Sent To Confirm Email Address'
+    }
+  }
+
+   function formIsOk() {
+  const name = document.getElementById('Name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const strategies = Array.from(document.getElementById('Strategy').selectedOptions).map(opt => opt.value);
+  const specify = document.getElementById('specify').value.trim();
+  const termsAgreed = document.querySelector('input[type="checkbox"]').checked;
+  const errorBox = document.getElementById('error');
+
+  // Name
+  if (!name) {
+    showError("Name is required.");
+    return false;
+  }
+
+  // Email
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailPattern.test(email)) {
+    showError("Please enter a valid email address.");
+    return false;
+  }
+
+  // Password
+  if (!password || password.length < 6) {
+    showError("Password must be at least 6 characters.");
+    return false;
+  }
+
+  // Strategy
+  if (strategies.length === 0) {
+    showError("Please select at least one marketing strategy.");
+    return false;
+  }
+
+  // If "Others" is selected, "specify" must not be empty
+  if (strategies.includes("Others") && !specify) {
+    showError("Please specify your 'Other' marketing strategy.");
+    return false;
+  }
+
+  // Terms and Conditions
+  if (!termsAgreed) {
+    showError("You must agree to the terms and privacy policy.");
+    return false;
+  }
+
+  // All good
+  errorBox.style.display = "none";
+  return true;
+
+  // Helper
+  function showError(msg) {
+    errorBox.textContent = "Error: " + msg;
+    errorBox.style.display = "block";
+  }
+}
+
+  
+  function su(event){
+   event.preventDefault();
+   if(formIsOk()) {
+    document.getElementById('cover').style.display = 'flex'
+   var e = document.getElementById('email').value;
+   var p = document.getElementById('password').value;
+   
+   registerUser(e,p);
+   }
+
+  }
+  
+</script>
+
+
+</body>
+
+</html>

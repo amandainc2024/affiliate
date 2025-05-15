@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Log in</title>
+ <script src="browser.js"></script>
+ <script src="styles.js"></script>
+
+</head>
+
+<body class="box-border px-2 md:w-1/2 md:ml-1/4">
+   
+   <h1 class="my-18 text-center text-3xl font-bold">Log in</h1>
+   <form action="">
+     <output style="display: none;" class="border-red-500 bg-red-100 block p-2 w-full outline-0 border rounded-sm" id="error">Error: Some kind of error message on submission</output>
+
+    <a href="register.html" class="text-blue-600 block">Sign Up Instead</a>
+    <label for="email" class="mt-5 block">Email</label>
+    <input type="email" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" name="email" id="email" value="" />
+    
+    <label for="password" class="mt-5 block">Password</label>
+    <input type="password" name="password" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" id="password" value="" />
+    <a href="" class="text-blue-600 block">Forgot Password</a>
+    <button type="submit" class="bg-blue-600 float-right text-white mt-3 py-2 px-4 rounded-sm " onclick="auth(event)">Continue</button>
+   </form>
+   
+   <p class="text-center fixed bottom-3 opacity-50">&copy; Copyright 2025. All rights reserved</p>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Initialize Supabase client
+  
+  const supabaseUrl = "https://dlittddujwtdceassnwh.supabase.co";
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXR0ZGR1and0ZGNlYXNzbndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjUwMzksImV4cCI6MjA2MTYwMTAzOX0.Ro-mvdFQr1FDh219EPuI2Fm2S3yYXeTBwiO9UxIFv0s'; // Replace with your public anon key
+  
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  async function authUser(email, password) {
+    
+
+    const { data, error } = await client.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+      
+
+    if (error) {
+      console.error('Registration error:', error.message);
+     const errorBox = document.getElementById('error');
+
+ errorBox.textContent = "Error: " + error.message;
+ errorBox.style.display = "block";
+
+      
+    }
+    if(data.user.aud){
+      console.log(data)
+      window.location.href = 'dashboard.html'
+    }
+  }
+  
+  function auth(event){
+    event.preventDefault();
+     const errorBox = document.getElementById('error');
+
+    errorBox.style.display = "none";
+    
+    authUser(document.getElementById('email').value.trim(),document.getElementById('password').value.trim())
+  }
+
+    
+</script>
+
+</body>
+
+</html>

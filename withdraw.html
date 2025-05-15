@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title></title>
+ <script src="browser.js"></script>
+ <script src="styles.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body class="box-border px-2">
+ 
+ <h1 class="my-18 text-center text-3xl font-bold">Request Withdraw</h1>
+ <form action="" id="form">
+  <a href="" class="text-blue-600 block">Cancel </a>
+  <p id="error" class="bg-gray-50 border border-gray-200 m-1 p-2">Withdraw</p>
+  <label for="phone" class="mt-5 block">Mobile Money Number (Ugandans)</label>
+  <b class="w-1/6">+256</b><input type="phone" class="border-gray-500 p-2 w-5/6 outline-0 border rounded-sm" name="phone" id="phone" value="" />
+  
+  <label for="password" class="mt-5 block">Password</label>
+  <input type="password" name="password" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" id="password" value="" />
+  
+  <label for="amount" class="mt-5 block">Amount ($)</label>
+  <input type="amount" name="password" class="border-gray-500 p-2 w-full outline-0 border rounded-sm" id="amount" value="" />
+
+  <a href="" class="text-blue-600 block">Withdraw via an Amanda Agent (None Ugandans)</a>
+  <p class="text-sm text-gray-600">The transaction will be completed in atmost 24 business working hours</p>
+  <button type="submit" class="bg-blue-600 float-right text-white mt-3 py-2 px-4 rounded-sm ">Continue</button>
+ </form>
+ 
+ <p class="text-center fixed bottom-3 opacity-50">&copy; Copyright 2025. All rights reserved</p>
+ <script>
+  // Initialize Supabase client
+  
+  const supabaseUrl = "https://dlittddujwtdceassnwh.supabase.co";
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXR0ZGR1and0ZGNlYXNzbndoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwMjUwMzksImV4cCI6MjA2MTYwMTAzOX0.Ro-mvdFQr1FDh219EPuI2Fm2S3yYXeTBwiO9UxIFv0s'; // Replace with your public anon key
+  
+  const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  document.querySelector('form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const amount = parseFloat(document.getElementById('amount').value.trim());
+
+    if (!phone || !password || isNaN(amount)) {
+      document.getElementById('error').innerText = "Please fill all fields correctly.";
+      return;
+    }
+document.querySelector('button').style.background = '#55f6'
+    document.querySelector('button').innerHTML = 'Submitting...'
+
+
+</script>
+
+</body>
+
+</html>
