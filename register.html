@@ -71,7 +71,10 @@
 
     const { data, error } = await client.auth.signUp({
       email: email,
-      password: password
+      password: password,
+     options: {
+    emailRedirectTo: 'https://amandainc.xyz/dashboard.html'
+  }
     });
       
 
